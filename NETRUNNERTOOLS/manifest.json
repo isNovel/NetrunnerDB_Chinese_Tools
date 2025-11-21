@@ -1,0 +1,71 @@
+{
+  "manifest_version": 3,
+  "name": "NetrunnerDB 简中工具 (翻译与 PNP)",
+  "version": "2.7",
+  "description": "整合卡牌名称中文翻译功能与 Print and Play 简中卡图 PDF 生成功能。",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://netrunnerdb.com/*",
+    "https://card-images.netrunnerdb.com/*",
+    "https://play.sneakdoorbeta.net/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "NetrunnerDB 翻译模式",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    },
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://netrunnerdb.com/*"
+      ],
+      "exclude_matches": [
+        "https://netrunnerdb.com/en/print/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://netrunnerdb.com/en/print/*"
+      ],
+      "js": [
+        "contentPNP.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://netrunnerdb.com/en/print/*"
+      ],
+      "js": [
+        "inject.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "translation.json",
+        "translation2.json"
+      ],
+      "matches": [
+        "https://netrunnerdb.com/*"
+      ]
+    }
+  ]
+}
