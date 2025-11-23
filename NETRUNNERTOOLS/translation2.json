@@ -170,9 +170,12 @@
     "灌木丛": "Semak-samun",
     "同行评议": "Peer Review",
     "友安": "Mitra Aman",
-    "辉煌舞台: 制造明星": "Nebula Talent Management: Making Stars",
-    "辉煌舞台": "Nebula Talent Management",
-    "制造明星": "Making Stars",
+    "星云人才: 制造明星":"Nebula Talent Management: Making Stars",
+    "星云人才":"Nebula Talent Management" ,
+    "制造明星":"Making Stars",
+    "辉煌舞台: 熠熠生辉":"Gemilang Arena: Burning Bright",
+    "辉煌舞台":"Gemilang Arena",
+    "熠熠生辉":"Burning Bright",
     "突触环球: 先你所想": "Synapse Global: Faster than Thought",
     "突触环球": "Synapse Global",
     "先你所想": "Faster than Thought",
@@ -638,4 +641,5 @@
     "一切照旧": "Business As Usual",
     "伊萨克·利贝尔达德": "Isaac Liberdade",
     "当权者": "The Powers That Be"
+
 }
