@@ -198,7 +198,7 @@ function setupAutocomplete() {
       return;
     }
 
-    const filteredNames = chineseNames.filter(name => name.includes(query)).slice(0, 5); // 只顯示前 5 個
+    const filteredNames = chineseNames.filter(name => name.includes(query)); // 只顯示前 5 個
 
     if (filteredNames.length > 0) {
       filteredNames.forEach(name => {
