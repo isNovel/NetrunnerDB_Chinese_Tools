@@ -102,13 +102,28 @@
             setTimeout(waitForOriginalButtonAndInject, 500);
         }
     }
-
-    // 初始化 PNP 功能
+// === 新增：获取异画数据并发给页面主环境 ===
+    async function injectCustomArts() {
+        try {
+            const result = await chrome.storage.local.get('customArts');
+            const customArts = result.customArts || {};
+            window.postMessage({
+                type: 'NETRUNNER_CUSTOM_ARTS',
+                customArts: customArts
+            }, '*');
+            console.log('[Content Script] 已将自定义异画数据抛给主环境');
+        } catch (e) {
+            console.error('[Content Script] 读取异画数据失败:', e);
+        }
+    }
+// 初始化 PNP 功能 (修改此处)
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
+            injectCustomArts(); // 注入异画数据
             setTimeout(waitForOriginalButtonAndInject, 50);
         });
     } else {
+        injectCustomArts(); // 注入异画数据
         waitForOriginalButtonAndInject();
     }
 

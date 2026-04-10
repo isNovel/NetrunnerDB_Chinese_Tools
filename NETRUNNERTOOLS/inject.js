@@ -5,6 +5,16 @@
   console.log('\n═══════════════════════════════════════════');
   console.log('🎴 NETRUNNER PNP ZH SIMP INJECTOR ACTIVE (Main World)');
   console.log('═══════════════════════════════════════════\n');
+// === 新增：接收从 Content Script 传来的异画数据 ===
+  window.customArtsMap = {};
+  window.addEventListener('message', function (event) {
+    if (event.source !== window) return;
+    if (event.data.type === 'NETRUNNER_CUSTOM_ARTS') {
+      window.customArtsMap = event.data.customArts;
+      console.log(`[PNP-Inject] 成功接收到 ${Object.keys(window.customArtsMap).length} 张自定义异画配置`);
+    }
+  });
+  // ==================================================
 
   // ====================================================================
   // A. 翻譯網路攔截邏輯 (只在非 PNP 頁面執行)
@@ -149,6 +159,14 @@
       const cardCodeWithSuffix = match[1]; // e.g., "26066", "26066-0", "25001"
       // 您提供的多面卡基本代碼列表
       const multiSideBaseCodes = ["26066", "26120", "35023", "35057"];
+
+// === 新增：自定义异画检查 (以原网站后缀为准) ===
+      if (window.customArtsMap && window.customArtsMap[cardCodeWithSuffix]) {
+        console.log(`[PNP-Fix] 🎯 命中自定义异画: ${cardCodeWithSuffix}`);
+        // 返回带有特殊标记的 URL，阻断后续的正常转换
+        return `custom-art:${cardCodeWithSuffix}`;
+      }
+      // ==============================================
 
       let newCardCode = cardCodeWithSuffix;
 
@@ -355,6 +373,28 @@
           count = 0;
           that.doc.addPage(that.settings.format);
         }
+// === 新增：拦截自定义异画，直接触发渲染回调 ===
+        if (instance.url && instance.url.startsWith('custom-art:')) {
+            const altArtId = instance.url.split(':')[1];
+            const base64Data = window.customArtsMap[altArtId];
+            
+            if (base64Data) {
+                // 手动模拟 Content Script 发回成功事件，把 base64 直接传给 handleImageData
+                handleImageData({
+                    detail: {
+                        success: true,
+                        dataUrl: base64Data,
+                        cardIndex: instance.cardIndex,
+                        instanceIndex: instance.instanceIndex
+                    }
+                });
+                return; // 直接 return，不往下执行 dispatchEvent
+            } else {
+                console.warn(`[PNP] 异画数据丢失，跳过: ${altArtId}`);
+            }
+        }
+        // ===============================================
+
 
         // 發送圖片請求給 Content Script
         document.dispatchEvent(new CustomEvent('zhSimpGetImageEvent', {

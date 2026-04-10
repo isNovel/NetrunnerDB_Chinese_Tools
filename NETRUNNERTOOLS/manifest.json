@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "NetrunnerDB 简中工具 (翻译与 PNP)",
-  "version": "3.1",
+  "version": "3.2",
   "description": "整合卡牌名称中文翻译功能与 Print and Play 简中卡图 PDF 生成功能。",
   "permissions": [
     "activeTab",
-    "storage"
+    "storage",
+"unlimitedStorage"
   ],
   "host_permissions": [
     "https://netrunnerdb.com/*",

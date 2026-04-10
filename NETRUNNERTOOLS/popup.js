@@ -290,10 +290,103 @@ function handleBatchTranslate() {
     batchResultDiv.textContent = '无法识别任何有效的牌表行。';
   }
 }
+// ===================================================================
+// D. 自定义异画 (Alt Art) 逻辑
+// ===================================================================
+let customArts = {};
 
+async function loadCustomArts() {
+    try {
+        const result = await chrome.storage.local.get('customArts');
+        customArts = result.customArts || {};
+        renderAltArtList();
+    } catch (e) {
+        console.error("加载异画失败:", e);
+    }
+}
+
+function renderAltArtList() {
+    const list = document.getElementById('altArtList');
+    if (!list) return;
+    list.innerHTML = '';
+    
+    const ids = Object.keys(customArts);
+    if (ids.length === 0) {
+        list.innerHTML = '<li style="color:#888; justify-content:center;">暂无自定义异画</li>';
+        return;
+    }
+
+    ids.forEach(id => {
+        const li = document.createElement('li');
+        li.innerHTML = `<span>💳 ${id}</span> <button data-id="${id}" class="delete-art-btn">删除</button>`;
+        list.appendChild(li);
+    });
+
+    document.querySelectorAll('.delete-art-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            const id = e.target.getAttribute('data-id');
+            delete customArts[id];
+            await chrome.storage.local.set({ customArts });
+            renderAltArtList();
+            showSuccess(`已删除异画: ${id}`);
+        });
+    });
+}
+
+document.getElementById('addAltArtButton')?.addEventListener('click', () => {
+    const idInput = document.getElementById('altArtIdInput').value.trim();
+    const fileInput = document.getElementById('altArtFileInput').files[0];
+
+    if (!idInput) { showError("请填写卡牌ID"); return; }
+    if (!fileInput) { showError("请选择图片文件"); return; }
+
+    const btn = document.getElementById('addAltArtButton');
+    btn.textContent = "正在处理...";
+    btn.disabled = true;
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+            // 使用 Canvas 调整尺寸并压缩
+            const canvas = document.createElement('canvas');
+            const MAX_WIDTH = 800; // 宽度限制在800像素，足以支持高清打印
+            let width = img.width;
+            let height = img.height;
+
+            if (width > MAX_WIDTH) {
+                height = Math.round(height * (MAX_WIDTH / width));
+                width = MAX_WIDTH;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            // 转换为 WEBP Base64 数据 (压缩率 0.85)
+            const base64Data = canvas.toDataURL('image/webp', 1);
+
+            customArts[idInput] = base64Data;
+            chrome.storage.local.set({ customArts }, () => {
+                renderAltArtList();
+                showSuccess(`异画保存成功: ${idInput}`);
+                document.getElementById('altArtIdInput').value = '';
+                document.getElementById('altArtFileInput').value = '';
+                btn.textContent = "保存/覆盖异画";
+                btn.disabled = false;
+            });
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(fileInput);
+});
+
+// !!! 注意：你需要在这个文件的 document.addEventListener('DOMContentLoaded', ...) 函数中，
+// 补充加入一句: await loadCustomArts(); 确保页面打开时能加载列表。
 
 // ===================================================================
-// D. 初始化 (DOMContentLoaded)
+// E. 初始化 (DOMContentLoaded)
 // ===================================================================
 
 document.addEventListener('DOMContentLoaded', async function () {
@@ -305,6 +398,9 @@ document.addEventListener('DOMContentLoaded', async function () {
 
   // 3. 設置自動完成功能 (需在載入完 zhToEnMap 後執行)
   setupAutocomplete();
+
+ // 4. 設置異畫功能 
+await loadCustomArts();
 
   // 4. 綁定翻譯模式按鈕事件
   document.getElementById('zhOnlyButton')?.addEventListener('click', () => handleTranslationModeChange('zh_only'));

@@ -183,6 +183,43 @@
       word-break: break-all;
       border-radius: 3px;
     }
+/* 自定义异画特定样式 */
+    .custom-art-tool {
+      text-align: left;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      background-color: #fff;
+      margin-top: 15px;
+    }
+    .custom-art-tool input[type="file"] {
+      margin-bottom: 10px;
+    }
+    #altArtList {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 10px;
+      max-height: 150px;
+      overflow-y: auto;
+      border-top: 1px dashed #ccc;
+    }
+    #altArtList li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 5px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 13px;
+    }
+    .delete-art-btn {
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 3px;
+      padding: 3px 8px;
+      cursor: pointer;
+      font-size: 12px;
+    }
   </style>
 </head>
 
@@ -220,7 +257,14 @@
       翻译结果会显示在这里...
     </div>
   </div>
-
+<div class="custom-art-tool">
+    <h4>自定义异画 (PNP替换)</h4>
+    <input type="text" id="altArtIdInput" placeholder="输入卡牌ID (如 25001 或 26066-0)">
+    <input type="file" id="altArtFileInput" accept="image/*">
+    <button id="addAltArtButton" style="width:100%; padding:8px; background-color:#28a745; color:white; border:none; border-radius:4px; cursor:pointer;">保存/覆盖异画</button>
+    <ul id="altArtList">
+      </ul>
+  </div>
   <script src="popup.js"></script>
 </body>
 
